@@ -1,24 +1,28 @@
-import { Job } from './jobs.model';
-import { IJob } from './jobs.interface';
+import { Job } from "./jobs.model";
+import { IJob } from "./jobs.interface";
 
 const createJob = async (payload: IJob): Promise<IJob> => {
   const result = await Job.create(payload);
   return result;
 };
 
-const getAllJobs = async (filters: { category?: string; location?: string; search?: string }): Promise<IJob[]> => {
+const getAllJobs = async (filters: {
+  category?: string;
+  location?: string;
+  search?: string;
+}): Promise<IJob[]> => {
   const query: any = {};
-  
+
   if (filters.category) {
-    query.category = { $regex: filters.category, $options: 'i' };
+    query.category = { $regex: filters.category, $options: "i" };
   }
   if (filters.location) {
-    query.location = { $regex: filters.location, $options: 'i' };
+    query.location = { $regex: filters.location, $options: "i" };
   }
   if (filters.search) {
     query.$or = [
-      { title: { $regex: filters.search, $options: 'i' } },
-      { company: { $regex: filters.search, $options: 'i' } }
+      { title: { $regex: filters.search, $options: "i" } },
+      { company: { $regex: filters.search, $options: "i" } },
     ];
   }
 
@@ -31,6 +35,17 @@ const getJobById = async (id: string): Promise<IJob | null> => {
   return result;
 };
 
+const updateJob = async (
+  id: string,
+  payload: Partial<IJob>,
+): Promise<IJob | null> => {
+  const result = await Job.findByIdAndUpdate(id, payload, {
+    new: true,
+    runValidators: true,
+  });
+  return result;
+};
+
 const deleteJob = async (id: string): Promise<IJob | null> => {
   const result = await Job.findByIdAndDelete(id);
   return result;
@@ -40,5 +55,6 @@ export const JobService = {
   createJob,
   getAllJobs,
   getJobById,
+  updateJob,
   deleteJob,
 };
